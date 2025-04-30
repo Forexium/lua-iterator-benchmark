@@ -2,7 +2,7 @@
 **Author**: focat  
 **Date**: 4/30/2025  
 **Version**: 2.0  
-<sub><sup>maybe perchance ragebait... `next` is still better tho</sup></sub>  
+<sub><sup>maybe perchance biased ragebait... `next` is still better tho</sup></sub>  
 
 ## **1. Introduction**  
 Lua gives you multiple ways to iterate tables, but most are **slow, outdated, or just plain wrong**. The only correct choice is `next()`. Here's why:  
