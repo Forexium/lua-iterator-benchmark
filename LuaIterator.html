@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-900 text-white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why next() is the Best Lua Table Iterator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="px-8 py-6 font-sans text-white">
+
+  <h1 class="text-3xl font-bold mb-2">
+    Why <code class="bg-gray-700 px-1 rounded">next</code> is the Best Lua Table Iterator (And Why You Should Use It Everywhere)
+  </h1>
+
+  <div class="text-sm text-gray-400 mb-6">
+    <p><strong>Author:</strong> yonhubff2</p>
+    <p><strong>Date:</strong> 6/5/25</p>
+    <p><strong>Version:</strong> 1.0</p>
+    <p class="italic text-gray-500 mt-1">maybe perchance biased ngl... <code class="bg-gray-700 px-1 rounded">next</code> is still better tho</p>
+  </div>
+
+  <h2 class="text-xl font-semibold mb-2">1. Introduction</h2>
+  <p class="mb-4">
+    Lua gives you multiple ways to iterate tables, but most are <span class="text-red-400 font-semibold">slow, outdated, or just plain wrong</span>. The only correct choice is
+    <code class="bg-gray-700 px-1 rounded">next()</code>. Here's why:
+  </p>
+
+  <h3 class="font-semibold mb-2">The Lua Iterator Hierarchy (From Worst to Best)</h3>
+  <ul class="space-y-1 mb-8">
+    <li>❌ <code class="bg-gray-700 px-1 rounded">ipairs()</code> – <span class="text-red-400 font-bold">Legacy trash</span></li>
+    <li>❌ <code class="bg-gray-700 px-1 rounded">pairs()</code> – <span class="text-yellow-400">Decent, but why settle for a wrapper?</span></li>
+    <li>✅ <code class="bg-gray-700 px-1 rounded">next()</code> – <span class="text-green-400 font-bold">The Sigma</span></li>
+    <li>⚠️ <code class="bg-gray-700 px-1 rounded">numeric_for</code> – <span class="text-yellow-300">Fast but useless</span></li>
+  </ul>
+
+  <h2 class="text-xl font-semibold mb-2">2. Benchmark Results (Objective Facts Supporting My Bias)</h2>
+  <h3 class="text-lg mb-2">2.1 Sequential Array (5000 Elements)</h3>
+  <table class="table-auto border border-gray-700 w-full text-sm mb-4">
+    <thead class="bg-gray-800">
+      <tr><th class="p-2 border">Method</th><th class="p-2 border">Avg Time (s)</th><th class="p-2 border">Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="p-2 border">ipairs</td><td class="p-2 border">0.092976</td><td class="p-2 border text-red-400">❌ Slowest (why does this exist?)</td></tr>
+      <tr><td class="p-2 border">pairs</td><td class="p-2 border">0.089869</td><td class="p-2 border">❌ Slower than <code>next</code></td></tr>
+      <tr class="bg-gray-800"><td class="p-2 border">next</td><td class="p-2 border">0.088931</td><td class="p-2 border text-green-400 font-semibold">✅ Winner (by 0.000038s!)</td></tr>
+      <tr><td class="p-2 border">numeric_for</td><td class="p-2 border">0.030025</td><td class="p-2 border text-yellow-300">⚠️ Fast but irrelevant</td></tr>
+    </tbody>
+  </table>
+  <p class="mb-6">
+    <strong>Takeaway:</strong><br>
+    • <code>next</code> &gt; <code>pairs</code> (always, even if by microseconds).<br>
+    • <code>ipairs</code> is objectively worse than both.
+  </p>
+
+  <h3 class="text-lg mb-2">2.2 Sparse Array (Only 20% Filled)</h3>
+  <table class="table-auto border border-gray-700 w-full text-sm mb-4">
+    <thead class="bg-gray-800">
+      <tr><th class="p-2 border">Method</th><th class="p-2 border">Avg Time (s)</th><th class="p-2 border">Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="p-2 border">pairs</td><td class="p-2 border">0.025599</td><td class="p-2 border text-red-400">❌ Slower (again)</td></tr>
+      <tr><td class="p-2 border">next</td><td class="p-2 border">0.025503</td><td class="p-2 border text-green-400">✅ Still winning</td></tr>
+      <tr><td class="p-2 border">numeric_for</td><td class="p-2 border">0.000031</td><td class="p-2 border text-yellow-300">⚠️ Fast but WRONG (skips keys)</td></tr>
+    </tbody>
+  </table>
+  <p class="mb-6">
+    <strong>Takeaway:</strong><br>
+    • <code>numeric_for</code> is cheating.<br>
+    • <code>next</code> respects your data while being fastest.
+  </p>
+
+  <h3 class="text-lg mb-2">2.3 Non-Numeric Table (String Keys, Real-World Use Case)</h3>
+  <table class="table-auto border border-gray-700 w-full text-sm mb-4">
+    <thead class="bg-gray-800">
+      <tr><th class="p-2 border">Method</th><th class="p-2 border">Avg Time (s)</th><th class="p-2 border">Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="p-2 border">pairs</td><td class="p-2 border">0.187165</td><td class="p-2 border text-red-400">❌ Slower (always)</td></tr>
+      <tr><td class="p-2 border">next</td><td class="p-2 border">0.182013</td><td class="p-2 border text-green-400">✅ 3% faster (free performance!)</td></tr>
+    </tbody>
+  </table>
+  <p class="mb-6">
+    <strong>Takeaway:</strong><br>
+    • <code>next</code> is always faster than <code>pairs</code>. No exceptions.
+  </p>
+
+  <h2 class="text-xl font-semibold mb-2">3. Why <code>next</code> is the Only Logical Choice</h2>
+  <h3 class="font-semibold mt-4">3.1 Performance (It's Faster, Period)</h3>
+  <ul class="list-disc list-inside mb-4">
+    <li>Beats <code>pairs</code> in every test.</li>
+    <li>3% faster on non-numeric tables.</li>
+    <li>No iterator overhead.</li>
+  </ul>
+  <h3 class="font-semibold">3.2 Flexibility (Works on Everything)</h3>
+  <ul class="list-disc list-inside mb-4">
+    <li>✅ Arrays? Yes.</li>
+    <li>✅ Sparse tables? Yes.</li>
+    <li>✅ Mixed keys? Yes.</li>
+    <li>✅ Non-numeric keys? Yes.</li>
+    <li>❌ <code>ipairs</code> / <code>numeric_for</code>? No.</li>
+  </ul>
+  <h3 class="font-semibold">3.3 Consistency (One Iterator to Rule Them All)</h3>
+  <ul class="list-disc list-inside">
+    <li>Why learn three ways when one does it all better?</li>
+    <li>Eliminates "which iterator should I use?" forever.</li>
+  </ul>
+
+</body>
+</html>
